@@ -1,0 +1,58 @@
+```
+# Build results
+**/bin/
+**/obj/
+**/out/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# Build results of Visual Studio Analyzer packages
+!**/Microsoft.CodeAnalysis.*.targets
+!**/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets
+
+# Dependencies
+packages/
+project.lock.json
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vs/
+.vscode/
+*.swp
+*.swo
+
+# Local test db
+*.db
+*.db-journal
+
+# Performance tests
+Timing_*
+
+# IDE - VSCode
+.vscode/*
+
+# IDE - Visual Studio
+**/[Dd]ebug/
+**/[Dd]ebugPublic/
+**/[Rr]elease/
+**/[Rr]eleases/
+**/[Xx]64/
+**/[Xx]86/
+**/[Bb]uild/
+**/[Bb]in/
+**/[Oo]bj/
+```
