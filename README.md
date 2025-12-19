@@ -1,4 +1,4 @@
-**History of Caching**
+# History of Caching
 
 - **1940s--1960s**: Concept of fast-access memory emerged with early
   computer architectures.
@@ -16,7 +16,7 @@
   microservices, and high-throughput architectures.
 
 
-**Base Requirements of Caching**
+# Base Requirements of Caching
 
 **1. Performance & Speed**
 
@@ -72,7 +72,7 @@ The cache should offer easy integration with application frameworks
 support** for storing and retrieving complex data types.
 
 
-**Categories of Usage**
+# Categories of Usage
 
 | Category                             | Scope / Architecture                                  | Primary Use Case                                                | Key Characteristics                                                       | Common Examples                                                                   |
 |--------------------------------------|-------------------------------------------------------|-----------------------------------------------------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
@@ -83,7 +83,7 @@ support** for storing and retrieving complex data types.
 | **Data / Database Cache**            | Data‑access layer (app or DB engine)                  | Query results, computed datasets, object graphs.                | Reduces database load, requires invalidation logic, can be transparent.   | Redis (for query results), PostgreSQL buffers, Hibernate L2 cache.                |
 | **Persistent Cache**                 | Any cache that adds durability (local or distributed) | Critical cached data that is expensive to recompute.            | Survives restarts/failures via disk storage; adds slight I/O overhead.    | Redis with RDB/AOF, Ehcache with disk store.                                      |
 
-**Strategic Use of Caching:**
+# Strategic Use of Caching
 
 **When to Apply**
 
@@ -128,7 +128,8 @@ support** for storing and retrieving complex data types.
 | **Product Catalogs**             | High read volume, infrequent updates                    |
 | **Leaderboard Data**             | Real-time updates with fast reads                       |
 
-**Introduction to Redis**
+
+# Introduction to Redis
 
 **Overview:**
 
@@ -152,3 +153,156 @@ Created by Salvatore Sanfilippo in 2009.
 - Lua Scripting: Custom atomic operations.
 
  **Use Cases**: Caching, session stores, queues, leaderboards, real-time analytics.
+
+# Installation on Windows
+1. Microsoft's Redis for Windows (Recommended for Production)
+
+    *Install via Windows Package Manager (WinGet)*
+
+    *Install via Chocolatey*
+
+2. Windows Subsystem for Linux (WSL2) - Most Common Approach
+3. Docker for Windows
+4. Memurai (Commercial Alternative)
+5. MSI Installer (Old version - not recommended)
+
+
+# Installation on Linux
+**1. OS commands**
+```sh
+# Add Redis repository
+curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+
+# For Ubuntu 22.04/Jammy:
+echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+
+# Update and install
+sudo apt update
+sudo apt install redis
+```
+
+```sh
+# Add EPEL repository (for CentOS/RHEL)
+sudo dnf install epel-release
+
+# Install Redis
+sudo dnf install redis
+
+# Start and enable
+sudo systemctl start redis
+sudo systemctl enable redis
+```
+
+**2. From Source (Latest Version)**
+```sh
+# Install dependencies
+sudo apt install build-essential tcl # Ubuntu/Debian
+# OR
+sudo dnf groupinstall "Development Tools" # RHEL/CentOS/Fedora
+
+# Download latest stable version
+curl -O https://download.redis.io/redis-stable.tar.gz
+tar xzf redis-stable.tar.gz
+cd redis-stable
+
+# Compile
+make
+
+# Test compilation (optional but recommended)
+make test
+
+# Install system-wide
+sudo make install
+
+# Create configuration directory
+sudo mkdir /etc/redis
+sudo cp redis.conf /etc/redis/
+
+# Create systemd service (optional)
+# Copy systemd service file if available or create one
+```
+
+**3.Using Docker**
+```sh
+# Pull Redis image
+docker pull redis
+
+# Run Redis container
+docker run --name redis -d -p 6379:6379 redis
+
+# With persistent storage
+docker run --name redis -d -p 6379:6379 -v /path/to/data:/data redis redis-server --appendonly yes
+```
+
+**4. Using Redis Server Script (Simplified)**
+```sh
+#!/bin/bash
+# Save as install_redis.sh and run: bash install_redis.sh
+
+# For Ubuntu/Debian
+if [ -f /etc/debian_version ]; then
+    sudo apt update
+    sudo apt install -y redis-server
+    sudo systemctl enable redis-server
+    sudo systemctl start redis-server
+
+# For CentOS/RHEL
+elif [ -f /etc/redhat-release ]; then
+    sudo yum install -y epel-release
+    sudo yum install -y redis
+    sudo systemctl enable redis
+    sudo systemctl start redis
+fi
+
+# Test installation
+redis-cli ping
+```
+
+## Docker Compose on both Systems
+**generate required compose file**
+```
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+volumes:
+  redis_data:
+```
+**Run Redis**
+```sh
+# Start Redis
+docker-compose up -d
+
+# View logs
+docker-compose logs -f redis
+
+# Stop Redis
+docker-compose down
+
+# Stop and remove volumes
+docker-compose down -v
+
+# Check status
+docker-compose ps
+```
+
+**Connect to Redis CLI**
+```sh
+# Direct connection
+docker-compose exec redis redis-cli
+
+# With authentication
+docker-compose exec redis redis-cli -a yourpassword
+
+# From host machine
+redis-cli -h localhost -p 6379
+```
