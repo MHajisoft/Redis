@@ -260,7 +260,7 @@ redis-cli ping
 
 ## Docker Compose on both Systems
 **generate required compose file**
-```
+```yml
 version: '3.8'
 
 services:
@@ -305,4 +305,9 @@ docker-compose exec redis redis-cli -a yourpassword
 
 # From host machine
 redis-cli -h localhost -p 6379
+```
+**Environment Variables File (.env)**
+```env
+REDIS_PASSWORD=YourSecurePassword123
+REDIS_PORT=6379
 ```
