@@ -3,11 +3,31 @@ using System.Threading.Tasks;
 
 namespace CacheService.Interfaces
 {
-    public interface IRedisCacheService
+    /// <summary>
+    /// Main interface for Redis cache service supporting all Redis data types
+    /// </summary>
+    public partial interface IRedisCacheService
     {
-        Task<T?> GetAsync<T>(string key);
-        Task SetAsync<T>(string key, T value, TimeSpan expiration);
-        Task RemoveAsync(string key);
-        Task<bool> ExistsAsync(string key);
+        /// <summary>
+        /// Connect to Redis server
+        /// </summary>
+        Task<bool> ConnectAsync();
+
+        /// <summary>
+        /// Disconnect from Redis server
+        /// </summary>
+        Task DisconnectAsync();
+
+        /// <summary>
+        /// Check if connected to Redis
+        /// </summary>
+        bool IsConnected { get; }
+
+        /// <summary>
+        /// Get database instance
+        /// </summary>
+        /// <param name="db">Database index (optional)</param>
+        /// <returns>Redis database instance</returns>
+        StackExchange.Redis.IDatabase GetDatabase(int? db = null);
     }
 }
