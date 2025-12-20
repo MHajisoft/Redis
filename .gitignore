@@ -1,58 +1,44 @@
 ```
-# Build results
-**/bin/
-**/obj/
-**/out/
-
-# User-specific files
-*.user
-*.userosscache
-*.suo
-*.userprefs
-
-# Build results of Visual Studio Analyzer packages
-!**/Microsoft.CodeAnalysis.*.targets
-!**/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets
-
 # Dependencies
 packages/
-project.lock.json
-
-# Environment
-.env
-.env.local
+**/bin/
+**/obj/
 
 # Logs
 *.log
+
+# Environment specific
+.vscode/
+.idea/
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# Editor files
-.vs/
-.vscode/
-*.swp
-*.swo
+# User-specific
+*.user
+*.userosscache
+*.suo
 
-# Local test db
-*.db
-*.db-journal
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
 
-# Performance tests
-Timing_*
-
-# IDE - VSCode
-.vscode/*
-
-# IDE - Visual Studio
-**/[Dd]ebug/
-**/[Dd]ebugPublic/
-**/[Rr]elease/
-**/[Rr]eleases/
-**/[Xx]64/
-**/[Xx]86/
-**/[Bb]uild/
-**/[Bb]in/
-**/[Oo]bj/
+# Visual Studio cache/options
+*.VC.db
+*.VC.VC.opendb
+*.VC.VC.opendb-shm
+*.VC.VC.opendb-wal
+*.VC.VC.opendb-shm
+*.VC.VC.opendb-wal
+*.VC.VC.opendb-shm
+*.VC.VC.opendb-wal
 ```

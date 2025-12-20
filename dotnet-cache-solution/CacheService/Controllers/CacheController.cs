@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using CacheService.Interfaces;
+using CacheService.Models;
 
 namespace CacheService.Controllers
 {
@@ -161,12 +163,5 @@ namespace CacheService.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-    }
-
-    public class CacheRequest
-    {
-        public string Key { get; set; } = string.Empty;
-        public string Value { get; set; } = string.Empty;
-        public int ExpirationInMinutes { get; set; } = 10;
     }
 }
