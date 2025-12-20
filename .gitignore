@@ -1,44 +1,37 @@
 ```
 # Dependencies
 packages/
-**/bin/
-**/obj/
+bin/
+obj/
 
 # Logs
 *.log
 
-# Environment specific
-.vscode/
-.idea/
+# Environment
+.env
+.env.local
+*.env.*
 
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# User-specific
-*.user
-*.userosscache
-*.suo
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-build/
-bld/
-[Bb]in/
-[Oo]bj/
+# Build outputs
+debug/
+release/
+*.dll
+*.exe
+*.pdb
+*.so
+*.dylib
 
-# Visual Studio cache/options
-*.VC.db
-*.VC.VC.opendb
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
+# Testing
+TestResults/
+coverage/
 ```

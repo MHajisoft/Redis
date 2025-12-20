@@ -1,5 +1,4 @@
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
@@ -7,7 +6,7 @@ using CacheService.Interfaces;
 
 namespace CacheService.Services
 {
-    public class RedisCacheService : IRedisCacheService
+    public partial class RedisCacheService : IRedisCacheService
     {
         private readonly IDistributedCache _distributedCache;
         private readonly IConnectionMultiplexer _redis;
@@ -18,33 +17,28 @@ namespace CacheService.Services
             _redis = redis;
         }
 
-        public async Task<T?> GetAsync<T>(string key)
+        public async Task<bool> ConnectAsync()
         {
-            var cachedValue = await _distributedCache.GetStringAsync(key);
-            if (string.IsNullOrEmpty(cachedValue))
-                return default(T);
-
-            return JsonSerializer.Deserialize<T>(cachedValue);
-        }
-
-        public async Task SetAsync<T>(string key, T value, TimeSpan expiration)
-        {
-            var serializedValue = JsonSerializer.Serialize(value);
-            await _distributedCache.SetStringAsync(key, serializedValue, new DistributedCacheEntryOptions
+            try
             {
-                AbsoluteExpirationRelativeToNow = expiration
-            });
+                return _redis.IsConnected;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public async Task RemoveAsync(string key)
+        public async Task DisconnectAsync()
         {
-            await _distributedCache.RemoveAsync(key);
+            _redis?.Close();
         }
 
-        public async Task<bool> ExistsAsync(string key)
+        public bool IsConnected => _redis?.IsConnected ?? false;
+
+        public StackExchange.Redis.IDatabase GetDatabase(int? db = null)
         {
-            var db = _redis.GetDatabase();
-            return await db.KeyExistsAsync(key);
+            return _redis.GetDatabase(db ?? -1);
         }
     }
 }
