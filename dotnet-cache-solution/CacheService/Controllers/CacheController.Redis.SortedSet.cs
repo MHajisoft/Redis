@@ -1,8 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using CacheService.Interfaces;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace CacheService.Controllers
 {
@@ -17,10 +13,10 @@ namespace CacheService.Controllers
                 // Parse the request body to extract member and score
                 var json = System.Text.Json.JsonSerializer.Serialize(request);
                 var doc = System.Text.Json.JsonDocument.Parse(json);
-                
-                string member = "";
+
+                var member = "";
                 double score = 0;
-                
+
                 foreach (var prop in doc.RootElement.EnumerateObject())
                 {
                     if (prop.Name.Equals("member", StringComparison.OrdinalIgnoreCase))
@@ -28,13 +24,13 @@ namespace CacheService.Controllers
                     else if (prop.Name.Equals("score", StringComparison.OrdinalIgnoreCase))
                         score = prop.Value.GetDouble();
                 }
-                
-                var added = await _redisCacheService.SortedSetAddAsync(key, member, score);
+
+                var added = await redisCacheService.SortedSetAddAsync(key, member, score);
                 return Ok(new { Key = key, Member = member, Score = score, Added = added, Operation = "SortedSetAdd" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adding to Redis sorted set");
+                logger.LogError(ex, "Error adding to Redis sorted set");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -44,12 +40,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                var members = await _redisCacheService.SortedSetRangeByScoreAsync(key, min, max);
+                var members = await redisCacheService.SortedSetRangeByScoreAsync(key, min, max);
                 return Ok(new { Key = key, Members = members, Min = min, Max = max, Type = "SortedSet" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Redis sorted set range");
+                logger.LogError(ex, "Error getting Redis sorted set range");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -59,7 +55,7 @@ namespace CacheService.Controllers
         {
             try
             {
-                var score = await _redisCacheService.SortedSetScoreAsync(key, member);
+                var score = await redisCacheService.SortedSetScoreAsync(key, member);
                 if (score == null)
                 {
                     return NotFound($"Member '{member}' in sorted set '{key}' not found");
@@ -69,7 +65,7 @@ namespace CacheService.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Redis sorted set score");
+                logger.LogError(ex, "Error getting Redis sorted set score");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -79,12 +75,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                var length = await _redisCacheService.SortedSetLengthAsync(key);
+                var length = await redisCacheService.SortedSetLengthAsync(key);
                 return Ok(new { Key = key, Length = length, Type = "SortedSet" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Redis sorted set length");
+                logger.LogError(ex, "Error getting Redis sorted set length");
                 return StatusCode(500, "Internal server error");
             }
         }

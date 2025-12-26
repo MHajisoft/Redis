@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using CacheService.Interfaces;
 using CacheService.Models;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace CacheService.Controllers
 {
@@ -15,12 +11,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                var count = await _redisCacheService.ListPushAsync(key, request.Value);
+                var count = await redisCacheService.ListPushAsync(key, request.Value);
                 return Ok(new { Key = key, Value = request.Value, NewLength = count, Operation = "ListPush" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error pushing to Redis list");
+                logger.LogError(ex, "Error pushing to Redis list");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -30,12 +26,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                var values = await _redisCacheService.ListRangeAsync(key, start, stop);
+                var values = await redisCacheService.ListRangeAsync(key, start, stop);
                 return Ok(new { Key = key, Values = values, Type = "List" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Redis list range");
+                logger.LogError(ex, "Error getting Redis list range");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -45,7 +41,7 @@ namespace CacheService.Controllers
         {
             try
             {
-                var value = await _redisCacheService.ListPopAsync(key);
+                var value = await redisCacheService.ListPopAsync(key);
                 if (value == null)
                 {
                     return NotFound($"List '{key}' is empty or does not exist");
@@ -55,7 +51,7 @@ namespace CacheService.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error popping from Redis list");
+                logger.LogError(ex, "Error popping from Redis list");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -65,12 +61,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                var length = await _redisCacheService.ListLengthAsync(key);
+                var length = await redisCacheService.ListLengthAsync(key);
                 return Ok(new { Key = key, Length = length, Type = "List" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Redis list length");
+                logger.LogError(ex, "Error getting Redis list length");
                 return StatusCode(500, "Internal server error");
             }
         }

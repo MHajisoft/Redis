@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using CacheService.Interfaces;
 using CacheService.Models;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace CacheService.Controllers
 {
@@ -15,7 +11,7 @@ namespace CacheService.Controllers
         {
             try
             {
-                var value = await _redisCacheService.GetAsync<string>(key);
+                var value = await redisCacheService.GetAsync<string>(key);
                 if (value == null)
                 {
                     return NotFound($"Key '{key}' not found in Redis cache");
@@ -25,7 +21,7 @@ namespace CacheService.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving from Redis cache");
+                logger.LogError(ex, "Error retrieving from Redis cache");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -35,12 +31,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                await _redisCacheService.SetAsync(request.Key, request.Value, TimeSpan.FromMinutes(request.ExpirationInMinutes));
+                await redisCacheService.SetAsync(request.Key, request.Value, TimeSpan.FromMinutes(request.ExpirationInMinutes));
                 return Ok(new { Message = $"Value set in Redis cache with key '{request.Key}'", Expiration = $"{request.ExpirationInMinutes} minutes" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error setting to Redis cache");
+                logger.LogError(ex, "Error setting to Redis cache");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -50,12 +46,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                await _redisCacheService.RemoveAsync(key);
+                await redisCacheService.RemoveAsync(key);
                 return Ok(new { Message = $"Key '{key}' removed from Redis cache" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error removing from Redis cache");
+                logger.LogError(ex, "Error removing from Redis cache");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -65,12 +61,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                var exists = await _redisCacheService.ExistsAsync(key);
+                var exists = await redisCacheService.ExistsAsync(key);
                 return Ok(new { Key = key, Exists = exists });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking Redis key existence");
+                logger.LogError(ex, "Error checking Redis key existence");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -81,7 +77,7 @@ namespace CacheService.Controllers
         {
             try
             {
-                var value = await _redisCacheService.GetStringAsync(key);
+                var value = await redisCacheService.GetStringAsync(key);
                 if (value == null)
                 {
                     return NotFound($"Key '{key}' not found in Redis cache");
@@ -91,7 +87,7 @@ namespace CacheService.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving Redis string");
+                logger.LogError(ex, "Error retrieving Redis string");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -101,12 +97,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                await _redisCacheService.SetStringAsync(request.Key, request.Value, TimeSpan.FromMinutes(request.ExpirationInMinutes));
+                await redisCacheService.SetStringAsync(request.Key, request.Value, TimeSpan.FromMinutes(request.ExpirationInMinutes));
                 return Ok(new { Message = $"String value set in Redis with key '{request.Key}'", Expiration = $"{request.ExpirationInMinutes} minutes" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error setting Redis string");
+                logger.LogError(ex, "Error setting Redis string");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -120,21 +116,21 @@ namespace CacheService.Controllers
                 // Parse the request body to extract expiration in minutes
                 var json = System.Text.Json.JsonSerializer.Serialize(request);
                 var doc = System.Text.Json.JsonDocument.Parse(json);
-                
-                int expirationInMinutes = 10; // default
-                
+
+                var expirationInMinutes = 10; // default
+
                 foreach (var prop in doc.RootElement.EnumerateObject())
                 {
                     if (prop.Name.Equals("expirationInMinutes", StringComparison.OrdinalIgnoreCase))
                         expirationInMinutes = prop.Value.GetInt32();
                 }
-                
-                var success = await _redisCacheService.ExpireAsync(key, TimeSpan.FromMinutes(expirationInMinutes));
+
+                var success = await redisCacheService.ExpireAsync(key, TimeSpan.FromMinutes(expirationInMinutes));
                 return Ok(new { Key = key, ExpirationInMinutes = expirationInMinutes, Success = success, Operation = "Expire" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error setting Redis key expiration");
+                logger.LogError(ex, "Error setting Redis key expiration");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -144,12 +140,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                var ttl = await _redisCacheService.GetTimeToLiveAsync(key);
+                var ttl = await redisCacheService.GetTimeToLiveAsync(key);
                 return Ok(new { Key = key, TimeToLive = ttl?.TotalSeconds, Unit = "seconds" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting Redis TTL");
+                logger.LogError(ex, "Error getting Redis TTL");
                 return StatusCode(500, "Internal server error");
             }
         }

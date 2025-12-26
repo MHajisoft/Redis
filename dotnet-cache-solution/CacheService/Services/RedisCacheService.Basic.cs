@@ -1,8 +1,5 @@
-using System;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
-using StackExchange.Redis;
 using CacheService.Interfaces;
 
 namespace CacheService.Services
@@ -11,7 +8,7 @@ namespace CacheService.Services
     {
         public async Task<T?> GetAsync<T>(string key)
         {
-            var cachedValue = await _distributedCache.GetStringAsync(key);
+            var cachedValue = await distributedCache.GetStringAsync(key);
             if (string.IsNullOrEmpty(cachedValue))
                 return default(T);
 
@@ -21,7 +18,7 @@ namespace CacheService.Services
         public async Task SetAsync<T>(string key, T value, TimeSpan expiration)
         {
             var serializedValue = JsonSerializer.Serialize(value);
-            await _distributedCache.SetStringAsync(key, serializedValue, new DistributedCacheEntryOptions
+            await distributedCache.SetStringAsync(key, serializedValue, new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = expiration
             });
@@ -29,12 +26,12 @@ namespace CacheService.Services
 
         public async Task RemoveAsync(string key)
         {
-            await _distributedCache.RemoveAsync(key);
+            await distributedCache.RemoveAsync(key);
         }
 
         public async Task<bool> ExistsAsync(string key)
         {
-            var db = _redis.GetDatabase();
+            var db = redis.GetDatabase();
             return await db.KeyExistsAsync(key);
         }
     }

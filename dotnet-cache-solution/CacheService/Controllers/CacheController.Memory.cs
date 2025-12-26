@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using CacheService.Interfaces;
 using CacheService.Models;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace CacheService.Controllers
 {
@@ -15,7 +11,7 @@ namespace CacheService.Controllers
         {
             try
             {
-                var value = await _memoryCacheService.GetAsync<string>(key);
+                var value = await memoryCacheService.GetAsync<string>(key);
                 if (value == null)
                 {
                     return NotFound($"Key '{key}' not found in memory cache");
@@ -25,7 +21,7 @@ namespace CacheService.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving from memory cache");
+                logger.LogError(ex, "Error retrieving from memory cache");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -35,12 +31,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                await _memoryCacheService.SetAsync(request.Key, request.Value, TimeSpan.FromMinutes(request.ExpirationInMinutes));
+                await memoryCacheService.SetAsync(request.Key, request.Value, TimeSpan.FromMinutes(request.ExpirationInMinutes));
                 return Ok(new { Message = $"Value set in memory cache with key '{request.Key}'", Expiration = $"{request.ExpirationInMinutes} minutes" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error setting to memory cache");
+                logger.LogError(ex, "Error setting to memory cache");
                 return StatusCode(500, "Internal server error");
             }
         }
@@ -50,12 +46,12 @@ namespace CacheService.Controllers
         {
             try
             {
-                await _memoryCacheService.RemoveAsync(key);
+                await memoryCacheService.RemoveAsync(key);
                 return Ok(new { Message = $"Key '{key}' removed from memory cache" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error removing from memory cache");
+                logger.LogError(ex, "Error removing from memory cache");
                 return StatusCode(500, "Internal server error");
             }
         }

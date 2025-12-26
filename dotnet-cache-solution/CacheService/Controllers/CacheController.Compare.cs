@@ -1,8 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using CacheService.Interfaces;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace CacheService.Controllers
 {
@@ -14,8 +10,8 @@ namespace CacheService.Controllers
         {
             try
             {
-                var memoryValue = await _memoryCacheService.GetAsync<string>(key);
-                var redisValue = await _redisCacheService.GetAsync<string>(key);
+                var memoryValue = await memoryCacheService.GetAsync<string>(key);
+                var redisValue = await redisCacheService.GetAsync<string>(key);
 
                 return Ok(new
                 {
@@ -28,7 +24,7 @@ namespace CacheService.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error comparing caches");
+                logger.LogError(ex, "Error comparing caches");
                 return StatusCode(500, "Internal server error");
             }
         }
