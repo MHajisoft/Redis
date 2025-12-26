@@ -128,6 +128,45 @@ support** for storing and retrieving complex data types.
 | **Product Catalogs**             | High read volume, infrequent updates                    |
 | **Leaderboard Data**             | Real-time updates with fast reads                       |
 
+# Common Caching Tools
+
+Caching tools are essential for improving application performance by storing frequently accessed data in memory (in-memory caching) or at the HTTP level (web/page caching). The most common ones fall into two main categories:
+
+- **In-memory/object caching** (e.g., for database queries, sessions, API results):
+  - Redis
+  - Memcached
+  - Hazelcast
+  - Aerospike
+- **Web/HTTP caching** (e.g., for full pages, static assets):
+  - Varnish
+  - Nginx (with caching modules)
+  - Squid
+
+Other notable mentions include Apache Ignite, Couchbase, and CDN-integrated tools like Cloudflare, but the above are the core open-source options widely used in 2025.
+
+**Comparison Table**
+
+| **Tool** | **Type** | **Data Structures Supported** | **Persistence** | **High Availability/Replication** | **Multi-threaded** | **Best For** | **Drawbacks** |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Redis** | In-memory key-value store | Strings, hashes, lists, sets, sorted sets, bitmaps, hyperloglogs, etc. | Yes (RDB/AOF) | Yes (clustering, sentinel) | No (single-threaded event loop) | Versatile caching, sessions, pub/sub, queues, leaderboards, real-time apps | Single-threaded core limits extreme CPU scaling; persistence adds overhead |
+| **Memcached** | Distributed in-memory cache | Simple key-value (strings/objects) | No  | Basic (client-side sharding) | Yes | Simple, high-throughput string/object caching | No persistence, limited data types, no native clustering |
+| **Hazelcast** | In-memory data grid | Distributed maps, queues, topics, etc. | Optional | Yes (strong consistency, partitioning) | Yes | Java-centric distributed apps, session clustering | Heavier footprint; primarily for Java ecosystems |
+| **Aerospike** | NoSQL in-memory database | Complex types (lists, maps, records) | Yes (hybrid memory+SSD) | Yes (strong consistency, auto-sharding) | Yes | High-scale real-time analytics with persistence | Steeper learning curve; more complex setup |
+| **Varnish** | HTTP accelerator | HTTP responses/pages | No (memory only) | Basic (via VCL/load balancing) | Yes | Full-page and edge caching for web content | Configuration via VCL; not for object caching |
+| **Nginx** | Web server + reverse proxy | HTTP content, proxy cache | Disk-based optional | Via load balancing | Yes | Reverse proxy caching, static assets serving | Less flexible cache invalidation than Varnish |
+| **Squid** | Forward/reverse proxy | HTTP objects | Disk-based | Basic | Yes | Traditional proxy caching in networks | Older technology; less common in modern stacks |
+
+**Ranking by Usage/Popularity (2025)**
+
+Based on adoption trends, developer surveys, market share in cloud services (e.g., AWS ElastiCache), and mentions in benchmarks/articles:
+
+- **Redis** - By far the most popular and widely used. It's versatile, feature-rich, and dominates in modern stacks (e.g., microservices, real-time apps). Often the default choice for new projects.
+- **Memcached** - Still common for simple, high-speed caching, especially in legacy systems or where raw throughput matters. Losing ground to Redis but reliable.
+- **Varnish/Nginx** - Top for web/HTTP caching; Nginx is ubiquitous as a server/proxy, with caching as a bonus.
+- **Hazelcast/Aerospike** - Niche but growing in enterprise/Java or high-consistency scenarios.
+- **Squid** - Less popular now, more for traditional proxy setups.
+
+Redis leads due to its balance of speed, features, and ecosystem support. For pure simplicity and speed in basic key-value scenarios, Memcached holds strong. Choose based on needs: complex data → Redis; simple strings → Memcached; full pages → Varnish/Nginx.
 
 # Introduction to Redis
 
