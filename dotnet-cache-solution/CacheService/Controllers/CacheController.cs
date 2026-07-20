@@ -11,15 +11,18 @@ namespace CacheService.Controllers
     {
         private readonly IMemoryCacheService _memoryCacheService;
         private readonly IRedisCacheService _redisCacheService;
+        private readonly IFusionCacheService _fusionCacheService;
         private readonly ILogger<CacheController> _logger;
 
         public CacheController(
             IMemoryCacheService memoryCacheService, 
             IRedisCacheService redisCacheService,
+            IFusionCacheService fusionCacheService,
             ILogger<CacheController> logger)
         {
             _memoryCacheService = memoryCacheService;
             _redisCacheService = redisCacheService;
+            _fusionCacheService = fusionCacheService;
             _logger = logger;
         }
 
@@ -559,6 +562,149 @@ namespace CacheService.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting Redis TTL");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        // FusionCache Endpoints
+        [HttpGet("fusion/{key}")]
+        public async Task<IActionResult> GetFromFusionCache(string key)
+        {
+            try
+            {
+                var value = await _fusionCacheService.GetAsync<string>(key);
+                if (value == null)
+                {
+                    return NotFound($"Key '{key}' not found in FusionCache");
+                }
+
+                return Ok(new { Key = key, Value = value, CacheType = "FusionCache" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving from FusionCache");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost("fusion")]
+        public async Task<IActionResult> SetToFusionCache([FromBody] CacheRequest request)
+        {
+            try
+            {
+                await _fusionCacheService.SetAsync(request.Key, request.Value, TimeSpan.FromMinutes(request.ExpirationInMinutes));
+                return Ok(new { Message = $"Value set in FusionCache with key '{request.Key}'", Expiration = $"{request.ExpirationInMinutes} minutes" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error setting to FusionCache");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpDelete("fusion/{key}")]
+        public async Task<IActionResult> RemoveFromFusionCache(string key)
+        {
+            try
+            {
+                await _fusionCacheService.RemoveAsync(key);
+                return Ok(new { Message = $"Key '{key}' removed from FusionCache" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing from FusionCache");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("fusion/check/{key}")]
+        public async Task<IActionResult> CheckFusionKeyExists(string key)
+        {
+            try
+            {
+                var exists = await _fusionCacheService.ExistsAsync(key);
+                return Ok(new { Key = key, Exists = exists });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking FusionCache key existence");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost("fusion/getoradd/{key}")]
+        public async Task<IActionResult> GetOrAddToFusionCache(string key, [FromBody] CacheRequest request)
+        {
+            try
+            {
+                var value = await _fusionCacheService.GetOrAddAsync(
+                    key, 
+                    () => Task.FromResult(request.Value),
+                    TimeSpan.FromMinutes(request.ExpirationInMinutes)
+                );
+                
+                return Ok(new { Key = key, Value = value, CacheType = "FusionCache", Operation = "GetOrAdd" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error using GetOrAdd in FusionCache");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("fusion/count")]
+        public async Task<IActionResult> GetFusionCacheCount()
+        {
+            try
+            {
+                var count = await _fusionCacheService.GetCountAsync();
+                return Ok(new { Count = count, CacheType = "FusionCache" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting FusionCache count");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost("fusion/clear")]
+        public async Task<IActionResult> ClearFusionCache()
+        {
+            try
+            {
+                await _fusionCacheService.ClearAsync();
+                return Ok(new { Message = "FusionCache cleared successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error clearing FusionCache");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("compare/all/{key}")]
+        public async Task<IActionResult> CompareAllCaches(string key)
+        {
+            try
+            {
+                var memoryValue = await _memoryCacheService.GetAsync<string>(key);
+                var redisValue = await _redisCacheService.GetAsync<string>(key);
+                var fusionValue = await _fusionCacheService.GetAsync<string>(key);
+
+                return Ok(new
+                {
+                    Key = key,
+                    MemoryCacheValue = memoryValue,
+                    RedisCacheValue = redisValue,
+                    FusionCacheValue = fusionValue,
+                    MemoryCacheExists = memoryValue != null,
+                    RedisCacheExists = redisValue != null,
+                    FusionCacheExists = fusionValue != null
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error comparing all caches");
                 return StatusCode(500, "Internal server error");
             }
         }
