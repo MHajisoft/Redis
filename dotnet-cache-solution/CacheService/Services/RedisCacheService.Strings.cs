@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-using StackExchange.Redis;
 using CacheService.Interfaces;
 
 namespace CacheService.Services
@@ -9,14 +6,14 @@ namespace CacheService.Services
     {
         public async Task<string?> GetStringAsync(string key)
         {
-            var db = _redis.GetDatabase();
+            var db = redis.GetDatabase();
             var value = await db.StringGetAsync(key);
             return value.HasValue ? value.ToString() : null;
         }
 
         public async Task SetStringAsync(string key, string value, TimeSpan? expiration = null)
         {
-            var db = _redis.GetDatabase();
+            var db = redis.GetDatabase();
             await db.StringSetAsync(key, value, expiration);
         }
     }

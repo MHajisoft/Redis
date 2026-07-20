@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using CacheService.Interfaces;
-using CacheService.Models;
-using System.Collections.Generic;
 
 namespace CacheService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+<<<<<<< HEAD
     public class CacheController : ControllerBase
     {
         private readonly IMemoryCacheService _memoryCacheService;
