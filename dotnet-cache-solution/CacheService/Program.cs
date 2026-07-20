@@ -22,6 +22,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 // Register custom cache services
 builder.Services.AddScoped<IMemoryCacheService, MemoryCacheService>();
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
+builder.Services.AddScoped<IFusionCacheService, FusionCacheService>();
 
 var app = builder.Build();
 
